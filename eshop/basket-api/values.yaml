@@ -9,7 +9,7 @@ namespace: eshop
 image:
   repository: dahalsujata52897/basket-api
   pullPolicy: IfNotPresent
-  tag: 69ce9b5
+  tag: latest
 
 nameOverride: ""
 fullnameOverride: ""

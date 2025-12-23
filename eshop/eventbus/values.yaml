@@ -9,7 +9,7 @@ namespace: eshop
 image:
   repository: docker.io/library/rabbitmq
   pullPolicy: IfNotPresent
-  tag: 3.13
+  tag: latest
 
 nameOverride: ""
 fullnameOverride: ""

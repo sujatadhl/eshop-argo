@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: dahalsujata52897/identity-api
   pullPolicy: IfNotPresent
-  tag: 6d075aa
+  tag: latest
 
 nameOverride: ""
 fullnameOverride: ""

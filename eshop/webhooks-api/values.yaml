@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: dahalsujata52897/webhooks-api
-  tag: 69ce9b5
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""

@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: dahalsujata52897/webapp
-  tag: aeadf58
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
