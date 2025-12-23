@@ -33,7 +33,7 @@ autoscaling:
 env:
   ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
   CallBackUrl: "http://webhooks-api.eshop.svc.cluster.local"
-  Identity__Url: "https://identity.agrow.farm"
+  Identity__Url: "https://identity-api.eshop.svc.cluster.local"
 
 volumeMounts:
 

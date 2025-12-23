@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-processor
+spec:
+  selector:
+    matchLabels:
+      app: payment-processor
+  template:
+    metadata:
+      labels:
+        app: payment-processor
+    spec:
+      containers:
+      - name: payment-processor
+        image:  dahalsujata52897/paymentprocessor
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ConnectionStrings__eventbus
+          value: amqp://eshop:YJr23N850SJBBqn9UUrXnE@eventbus:5672
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+          value: "true"
+        - name: DOTNET_LAUNCH_PROFILE
+          value: PaymentProcessor
+        - name: DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION
+          value: "true" 
+        volumeMounts:
+        - mountPath: /home/app/.aspnet/DataProtection-Keys
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim: 
+          claimName: pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-processor
+spec:
+  selector:
+    app: payment-processor
+  ports:
+  - port: 8080
+    targetPort: 8080

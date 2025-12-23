@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "webhookclient.labels" . | nindent 4 }}
+data:
+  {{- with .Values.env }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}

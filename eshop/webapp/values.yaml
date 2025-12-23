@@ -33,10 +33,10 @@ autoscaling:
   targetMemoryUtilizationPercentage: 80
 
 env:
-  CallBackUrl: "https://eshop.agrow.farm"
+  CallBackUrl: "https://webapp.eshop.svc.cluster.local"
   HTTP_PORTS: "8080"
   ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
-  IdentityUrl: "https://identity.agrow.farm"
+  IdentityUrl: "https://identity-api.eshop.svc.cluster.local"
   services__basket-api__http__0: "http://basket-api:8080"
   services__catalog-api__http__0: "http://catalog-api:8080"
   services__ordering-api__http__0: "http://ordering-api.eshop.svc.cluster.local"

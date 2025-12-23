@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "redis.labels" . | nindent 4 }}
+data:
+  # Redis configuration
+  redis.conf: |
+    # Redis configuration file
+    # You can add Redis-specific configuration here
+    # Example:
+    # maxmemory 256mb
+    # maxmemory-policy allkeys-lru
+    # save 900 1
+    # save 300 10
+    # save 60 10000
+  {{- with .Values.env }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}

@@ -34,36 +34,18 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: protocol
+              containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          # {{- with .Values.livenessProbe }}
-          # livenessProbe:
-          #   {{- toYaml . | nindent 12 }}
-          # {{- end }}
-          # {{- with .Values.readinessProbe }}
-          # readinessProbe:
-          #   {{- toYaml . | nindent 12 }}
-          # {{- end }}
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
           env:
           - name: RABBITMQ_DEFAULT_USER
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Release.Name }}-configmap
-                key: RABBITMQ_DEFAULT_USER
+            value: {{ .Values.env.RABBITMQ_DEFAULT_USER | quote }}
           - name: RABBITMQ_DEFAULT_PASS
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.secretStore.secretName }}
-                key: eventbus-password                            
+            value: {{ .Values.env.RABBITMQ_DEFAULT_PASS | quote }}                            
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

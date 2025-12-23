@@ -1,0 +1,16 @@
+1. Get the Redis server connection information:
+
+   Redis is available at the following DNS name from within your cluster:
+   
+   {{ include "redis.fullname" . }}.{{ .Values.namespace | default "default" }}.svc.cluster.local:{{ .Values.service.port }}
+
+2. To connect to your Redis server run the following commands:
+
+   kubectl run {{ include "redis.fullname" . }}-client --rm --tty -i --restart='Never' --namespace {{ .Values.namespace | default "default" }} --image redis:{{ .Values.image.tag | default .Chart.AppVersion }} -- redis-cli -h {{ include "redis.fullname" . }} -p {{ .Values.service.port }}
+
+3. To connect to your Redis server from outside the cluster execute the following commands:
+
+   kubectl port-forward --namespace {{ .Values.namespace | default "default" }} svc/{{ include "redis.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+   
+   Then connect using:
+   redis-cli -h 127.0.0.1 -p {{ .Values.service.port }}

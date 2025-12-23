@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basket-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: basket-api
+  template:
+    metadata:
+      labels:
+        app: basket-api
+    spec:
+      containers:
+      - name: basket-api
+        image: dahalsujata52897/basket-api
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+          value: "true"
+        - name: ConnectionStrings__eventbus
+          value: amqp://eshop:YJr23N850SJBBqn9UUrXnE@eventbus:5672
+        - name: ConnectionStrings__redis
+          value: redis://redis:6379
+        - name: DOTNET_LAUNCH_PROFILE
+          value: http
+        - name: DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION
+          value: "true"
+        - name: Identity__Url 
+          value: https://eshop.local
+          
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: basket-api
+spec:
+  selector:
+    app: basket-api
+  ports:
+  - port: 8080
+    targetPort: 8080
+  #   nodePort: 30001
+  # type: NodePort
+

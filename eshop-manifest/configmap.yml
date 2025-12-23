@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: all-env
+data:
+  identity_url: https://eshop.local
+  HTTP_PORTS: "8080"
+  ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+  ConnectionStrings__eventbus: amqp://eshop:YJr23N850SJBBqn9UUrXnE@eventbus:5672
+  ConnectionStrings__redis: redis://redis:6379
+  ConnectionStrings__catalogdb: Host=db;Port=5432;Username=postgres;Password=Testtest#111;Database=catalogdb
+  ConnectionStrings__orderingdb: Host=db;Port=5432;Username=postgres;Password=Testtest#111;Database=orderingdb
+  ConnectionStrings__webhooksdb: Host=db;Port=5432;Username=postgres;Password=Testtest#111;Database=webhooksdb
+  ConnectionStrings__identitydb: Host=db;Port=5432;Username=postgres;Password=Testtest#111;Database=identitydb
+  init.sql: |
+    CREATE DATABASE orderingdb;
+    CREATE DATABASE catalogdb;
+    CREATE DATABASE identitydb;
+    CREATE DATABASE webhooksdb;
+  BasketApiClient: http://basket-api:8080
+  OrderingApiClient: http://172.24.158.233:30005
+  WebAppClient: https://webapp.local
+  WebhooksApiClient: http://172.24.158.233:30008
+  WebhooksWebClient: http://172.24.158.233:30007
+  services__basket-api__http__0: http://172.24.158.233:30001
+  services__catalog-api__http__0: http://172.24.158.233:30002
+  services__identity-api__http__0: http://eshop.local
+  services__identity-api__https__0: https://eshop.local
+  services__ordering-api__http__0: http://172.24.158.233:30005
+
+

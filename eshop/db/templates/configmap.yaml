@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "db.labels" . | nindent 4 }}
+data:
+  # Database initialization script
+  init.sql: |
+    -- PostgreSQL initialization script
+    -- Add your database initialization commands here
+    -- Example:
+    -- CREATE DATABASE eshop_db;
+    -- CREATE USER eshop_user WITH ENCRYPTED PASSWORD 'your_password';
+    -- GRANT ALL PRIVILEGES ON DATABASE eshop_db TO eshop_user;
+    
+    -- Enable pgvector extension
+    CREATE EXTENSION IF NOT EXISTS vector;
+    
+  {{- with .Values.env }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}

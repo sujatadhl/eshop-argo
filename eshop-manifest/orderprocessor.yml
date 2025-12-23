@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-processor
+spec:
+  replicas: 1  # Specify the number of replicas
+  selector:
+    matchLabels:
+      app: order-processor
+  template:
+    metadata:
+      labels:
+        app: order-processor
+    spec:
+      containers:
+      - name: order-processor
+        image:  dahalsujata52897/orderprocessor
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+          value: "true"
+        - name: ConnectionStrings__eventbus
+          value: amqp://eshop:YJr23N850SJBBqn9UUrXnE@eventbus:5672
+        - name: ConnectionStrings__orderingdb
+          value: Host=db;Port=5432;Username=postgres;Password=Testtest#111;Database=orderingdb
+        - name: DOTNET_LAUNCH_PROFILE
+          value: OrderProcessor
+        - name: DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION
+          value: "true"
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        volumeMounts:
+        - mountPath: /home/app/.aspnet/DataProtection-Keys
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim: 
+          claimName: pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-processor
+spec:
+  selector:
+    app: order-processor
+  ports:
+  - port: 8080
+    targetPort: 8080

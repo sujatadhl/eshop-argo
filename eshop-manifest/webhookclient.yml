@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-client
+spec:
+  selector:
+    matchLabels:
+      app: webhook-client
+  template:
+    metadata:
+      labels:
+        app: webhook-client
+    spec:
+      containers:
+      - name: webhook-client
+        image: dahalsujata52897/webhookclient:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        - containerPort: 8443
+        securityContext:   
+          runAsUser: 0
+        env: 
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+          value: "true"
+        - name: CallBackUrl
+          value: https://webhook.local
+        - name: IdentityUrl
+          value: https://eshop.local
+        - name: DOTNET_LAUNCH_PROFILE
+          value: https
+        - name: DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION
+          value: "true" 
+        - name: Identity__Url
+          value: https://eshop.local
+        - name: services__webhooks-api__http__0
+          value: http://webhooks-api:8080
+        volumeMounts:
+        - mountPath: /home/app/.aspnet/DataProtection-Keys
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim: 
+          claimName: pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-client
+spec:
+  selector:
+    app: webhook-client
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+    nodePort: 30007
+  type: NodePort
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webhook-client-ingress
+  labels:
+    name: webhook-client-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "32k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - webhook.local
+    secretName: webhook-tls
+  rules:
+  - host: webhook.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: webhook-client
+            port:
+              number: 8080

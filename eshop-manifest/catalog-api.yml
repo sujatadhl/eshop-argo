@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-api
+spec:
+  selector:
+    matchLabels:
+      app: catalog-api
+  template:
+    metadata:
+      labels:
+        app: catalog-api
+    spec:
+      containers:
+      - name: catalog-api
+        image: dahalsujata52897/catalog-api
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env: 
+        - name: "DOTNET_ReadOnlyDataProtectionKeyDirectory"
+          value: /home/app/.aspnet/DataProtection-Keys   
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+          value: "true"
+        - name: ConnectionStrings__eventbus
+          value: amqp://eshop:YJr23N850SJBBqn9UUrXnE@eventbus:5672
+        - name: ConnectionStrings__catalogdb
+          value: Host=db;Port=5432;Username=postgres;Password=Testtest#111;Database=catalogdb
+        - name: DOTNET_LAUNCH_PROFILE
+          value: http
+        - name: DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION
+          value: "true" 
+        volumeMounts:
+        - mountPath: /home/app/.aspnet/DataProtection-Keys
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim: 
+          claimName: pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-api
+spec:
+  selector:
+    app: catalog-api
+  ports:
+  - port: 8080
+    targetPort: 8080
+  #   nodePort: 30002
+  # type: NodePort

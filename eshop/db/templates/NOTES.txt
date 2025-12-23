@@ -1,0 +1,13 @@
+1. Get the PostgreSQL password by running:
+
+   export POSTGRES_PASSWORD=$(kubectl get secret --namespace {{ .Values.namespace | default "default" }} {{ include "db.fullname" . }} -o jsonpath="{.data.postgres-password}" | base64 -d)
+
+2. To connect to your database run the following command:
+
+   kubectl run {{ include "db.fullname" . }}-client --rm --tty -i --restart='Never' --namespace {{ .Values.namespace | default "default" }} --image ankane/pgvector:latest --env="PGPASSWORD=$POSTGRES_PASSWORD" \
+     --command -- psql --host {{ include "db.fullname" . }} -U {{ .Values.postgresql.auth.postgresUser }} -d {{ .Values.postgresql.auth.database }} -p {{ .Values.service.port }}
+
+3. To connect to your database from outside the cluster execute the following commands:
+
+   kubectl port-forward --namespace {{ .Values.namespace | default "default" }} svc/{{ include "db.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+   PGPASSWORD="{{ .Values.postgresql.auth.postgresPassword }}" psql --host 127.0.0.1 -U {{ .Values.postgresql.auth.postgresUser }} -d {{ .Values.postgresql.auth.database }} -p {{ .Values.service.port }}

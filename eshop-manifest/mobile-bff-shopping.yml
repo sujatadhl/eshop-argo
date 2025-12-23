@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mobile-bff-shopping
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mobile-bff-shopping
+  template:
+    metadata:
+      labels:
+        app: mobile-bff-shopping
+    spec:
+      containers:
+      - name: mobile-bff-shopping
+        image: dahalsujata52897/mobile-bff-shopping
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env: 
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+          value: "true"
+        - name: services__basket-api__http__0
+          value: http://basket-api:8080
+        - name: services__catalog-api__http__0
+          value: http://catalog-api:8080
+        - name: services__identity-api__http__0
+          value: http://eshop.local
+        - name: services__identity-api__https__0
+          value: https://eshop.local
+        - name: services__ordering-api__http__0
+          value: http://ordeting-api:8080
+        - name: DOTNET_LAUNCH_PROFILE
+          value: http
+        - name: DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION
+          value: "true" 
+        volumeMounts:
+        - mountPath: /home/app/.aspnet/DataProtection-Keys
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim: 
+          claimName: pvc
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: mobile-bff-shopping
+spec:
+  selector:
+    app: mobile-bff-shopping
+  ports:
+  - port: 8080
+    targetPort: 8080

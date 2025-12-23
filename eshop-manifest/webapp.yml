@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: dahalsujata52897/webapp-latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: CallBackUrl
+          value: https://webapp.local
+        - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+          value: "true"
+        - name: IdentityUrl
+          value: https://eshop.local
+        - name: ConnectionStrings__eventbus
+          value: amqp://eshop:YJr23N850SJBBqn9UUrXnE@eventbus:5672
+        - name: services__basket-api__http__0
+          value: http://basket-api:8080
+        - name: services__catalog-api__http__0
+          value: http://catalog-api:8080
+        - name: services__ordering-api__http__0
+          value: http://ordeting-api:8080
+        - name: "DOTNET_ReadOnlyDataProtectionKeyDirectory"
+          value: /home/app/.aspnet/DataProtection-Keys  
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: DOTNET_LAUNCH_PROFILE 
+          value: https 
+        volumeMounts:
+        - mountPath: /home/app/.aspnet/DataProtection-Keys
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim: 
+          claimName: pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp
+spec:
+  selector:
+    app: webapp
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30006
+    name: http
+  type: NodePort
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webapp-ingress
+  labels:
+    name: webapp-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "32k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - webapp.local
+    secretName: webapp-tls
+  rules:
+  - host: webapp.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: webapp
+            port: 
+              number: 8080

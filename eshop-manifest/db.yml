@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+spec:
+  selector:
+    matchLabels:
+      app: db
+  serviceName: db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: db
+        image: ankane/pgvector:latest
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: Testtest#111
+        volumeMounts:
+        - name: db-vol
+          mountPath: /var/lib/postgresql/data 
+        - name: psql-pv
+          mountPath: /docker-entrypoint-initdb.d 
+      volumes:
+      - name: psql-pv
+        configMap:
+          name: all-env
+          items:
+            - key: init.sql
+              path: init.sql
+  volumeClaimTemplates:
+  - metadata:
+      name: db-vol
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  selector:
+    app: db
+  ports:
+  - port: 5432
+    targetPort: 5432
