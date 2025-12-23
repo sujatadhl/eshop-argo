@@ -1,0 +1,90 @@
+replicaCount: 1
+
+image:
+  repository: dahalsujata52897/identity-api
+  pullPolicy: IfNotPresent
+  tag: 6d075aa
+
+nameOverride: ""
+fullnameOverride: ""
+
+namespace: eshop
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+  annotations:
+    servicelb.io/enabled: "true"
+resources:
+  requests:
+    # memory: "128Mi"
+    # cpu: "100m"
+  limits:
+    memory: "128Mi"
+    cpu: "100m"
+
+serviceAccount:
+  create: false
+  name: ""
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Disable unused features
+livenessProbe: {}
+readinessProbe: {}
+nodeSelector: {}
+affinity: {}
+tolerations: []
+
+env:
+  - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+    value: "true"
+  - name: BasketApiClient
+    value: "http://basket-api:8080"
+  - name: WebhooksApiClient
+    value: "http://webhooks-api.eshop.svc.cluster.local"
+  - name: OrderingApiClient
+    value: "http://ordering-api.eshop.svc.cluster.local"
+  - name: WebAppClient
+    value: "https://eshop.agrow.farm"
+  - name: WebhooksWebClient
+    value: "https://eshop.agrow.farm/webhook"
+  - name: TrustServerCertificate
+    value: "true"
+
+ingress:
+  enabled: true
+  name: ""
+  pathType: ImplementationSpecific
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+    ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+  className: "nginx"  
+
+volumeMounts:
+# - mountPath: /home/app/.aspnet/DataProtection-Keys
+#   name: azure-fs
+
+volumes: 
+# - name: azure-fs
+#   csi: 
+#     driver: file.csi.azure.com
+#     readOnly: false
+#     volumeAttributes:
+#       secretName: azure-sc-secret
+#       shareName: dataprotection
+
+secretStore:
+  secretName: kv-secrets
+
+securityContext:
+  runAsUser: 0

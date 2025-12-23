@@ -1,0 +1,62 @@
+replicaCount: 1
+
+namespace: eshop
+
+image:
+  repository: dahalsujata52897/ordering-api
+  pullPolicy: IfNotPresent
+  tag: 69ce9b5
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+# Disable features you don't need
+podAnnotations: {}
+podLabels: {}
+imagePullSecrets: []
+serviceAccount:
+  create: false
+  name: ""
+podSecurityContext: {}
+securityContext: {}
+livenessProbe: {}
+readinessProbe: {}
+nodeSelector: {}
+affinity: {}
+tolerations: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+resources:
+  requests:
+    # memory: "128Mi"
+    # cpu: "250m"
+  limits:
+    memory: "128Mi"
+    cpu: "100m"
+
+env:
+  - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+    value: "true"
+  - name: Identity__Url
+    value: "https://identity.agrow.farm"
+
+ingress:
+  enabled: false
+
+volumeMounts:
+
+volumes: 
+
+secretStore:
+  secretName: kv-secrets

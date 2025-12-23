@@ -1,0 +1,87 @@
+# Default values for basket-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+namespace: eshop
+
+image:
+  repository: dahalsujata52897/basket-api
+  pullPolicy: IfNotPresent
+  tag: 69ce9b5
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: 
+  app: basket-api
+  project: eshop
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources: 
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    # cpu: 100m
+    # memory: 128Mi  
+
+volumeMounts:
+- name: secrets-store01-inline
+  mountPath: /mnt/secrets-store/
+
+volumes: 
+- name: secrets-store01-inline
+  csi: 
+    driver:  secrets-store.csi.k8s.io
+    readOnly: true
+    volumeAttributes:
+      secretProviderClass: kv-secrets-provider
+
+ingress: 
+  enabled: false
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env:
+  identity_url: "https://identity.agrow.farm"
+  ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+
+userAssignedIdentityID: ""
+keyvaultName: ""
+tenantId: ""
+
+secretStore:
+  secretName: kv-secrets
+
+secretObjects:
+  - objectName: ConnectionStrings-eventbus
+    key: ConnectionStrings__eventbus
+  - objectName: ConnectionStrings-catalogdb
+    key: ConnectionStrings__catalogdb
+  - objectName: ConnectionStrings-identitydb
+    key: ConnectionStrings__identitydb
+  - objectName: ConnectionStrings-orderingdb
+    key: ConnectionStrings__orderingdb
+  - objectName: ConnectionStrings-webhooksdb
+    key: ConnectionStrings__webhooksdb
+  - objectName: ConnectionStrings-redis
+    key: ConnectionStrings__redis
+  - objectName: eventbus-password
+    key: eventbus-password

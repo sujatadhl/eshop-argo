@@ -1,0 +1,82 @@
+# Default values for basket-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+namespace: eshop
+
+image:
+  repository: dahalsujata52897/webhookclient
+  pullPolicy: IfNotPresent
+  tag: 69ce9b5
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: 
+  app: webhookclient
+  project: eshop
+
+podSecurityContext: 
+  # fsGroup: 2000
+
+#service
+service:
+  type: ClusterIP
+  port: 8080
+
+#ingress
+ingress:
+  enabled: false
+
+resources: 
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    # cpu: 100m
+    # memory: 128Mi
+
+livenessProbe:
+  # tcpSocket:
+  #   port: 8080
+  # initialDelaySeconds: 10
+  # periodSeconds: 10
+  # timeoutSeconds: 2
+  # failureThreshold: 3
+readinessProbe:
+  # tcpSocket:
+  #   port: 8080        
+  # initialDelaySeconds: 5  
+  # timeoutSeconds: 2      
+  # periodSeconds: 10       
+  # failureThreshold: 3   
+
+#hpa
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env:
+  ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+  services__webhooks-api__http__0: "http://webhooks-api.eshop.svc.cluster.local"
+  CallBackUrl: "https://agrow.farm"
+  identity_url: "https://identity.agrow.farm"
+
+secretStore:
+  secretName: kv-secrets
+
+volumeMounts:
+
+volumes: 

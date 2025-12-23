@@ -1,0 +1,6 @@
+apiVersion: v2
+name: payment-processor
+description: Helm chart for Payment Processor
+type: application
+version: 0.1.0
+appVersion: "latest"

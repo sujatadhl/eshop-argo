@@ -1,0 +1,64 @@
+replicaCount: 1
+
+namespace: eshop
+
+image:
+  repository: dahalsujata52897/paymentprocessor
+  pullPolicy: IfNotPresent
+  tag: 69ce9b5
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+# Disable unused features
+podAnnotations: {}
+podLabels: {}
+imagePullSecrets: []
+serviceAccount:
+  create: false
+  name: ""
+podSecurityContext: {}
+securityContext: {}
+
+resources:
+  requests:
+    # memory: "128Mi"
+    # cpu: "250m"
+  limits:
+    memory: "256Mi"
+    cpu: "100m"
+
+env:
+  - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+    value: "true"
+
+
+# Disable unused features
+livenessProbe: {}
+readinessProbe: {}
+nodeSelector: {}
+affinity: {}
+
+tolerations: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+ingress:
+  enabled: false
+
+volumeMounts:
+
+volumes: 
+
+secretStore:
+  secretName: kv-secrets

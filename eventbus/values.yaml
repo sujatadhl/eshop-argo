@@ -1,0 +1,54 @@
+# Default values for eventbus.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+namespace: eshop
+
+image:
+  repository: docker.io/library/rabbitmq
+  pullPolicy: IfNotPresent
+  tag: 3.13
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: 
+  app: eventbus
+  project: eshop
+
+service:
+  type: ClusterIP
+  port: 5672
+
+resources: 
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    # cpu: 100m
+    # memory: 128Mi  
+
+ingress: 
+  enabled: false
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env: 
+  RABBITMQ_DEFAULT_USER: eshop
+  
+secretStore:
+  secretName: kv-secrets

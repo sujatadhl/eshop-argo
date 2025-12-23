@@ -1,0 +1,55 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: identity-api-ingress
+  labels:
+    name: identity-api-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - eshop.agrow.farm
+    secretName: eshop-tls-1
+  - hosts:
+    - identity.agrow.farm
+    secretName: identity-tls
+  - hosts:
+    - agrow.farm
+    secretName: webhook-tls
+  rules:
+  - host: identity.agrow.farm
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: identity-api
+            port:
+              number: 80
+  - host: eshop.agrow.farm
+    http:
+      paths:   
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: webapp
+            port:
+              number: 80
+  - host: agrow.farm
+    http:
+      paths:                
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: webhookclient
+            port:
+              number: 8080

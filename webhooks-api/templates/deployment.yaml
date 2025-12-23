@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webhooks-api.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "webhooks-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "webhooks-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "webhooks-api.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+          env:
+          - name: ConnectionStrings__webhooksdb
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secretStore.secretName }}
+                key: ConnectionStrings__webhooksdb
+          - name: ConnectionStrings__eventbus
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secretStore.secretName }}
+                key: ConnectionStrings__eventbus                  
+          - name: ASPNETCORE_ENVIRONMENT
+            value: Development   
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
